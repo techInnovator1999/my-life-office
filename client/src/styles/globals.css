@@ -1,0 +1,217 @@
+/**
+ * Global Styles
+ * Import theme variables (must be before @tailwind)
+ */
+@import './themes.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Base styles
+ */
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-white dark:bg-slate-900 text-gray-900 dark:text-slate-100;
+    font-family: 'Inter', system-ui, sans-serif;
+    transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
+  }
+  
+  * {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+/**
+ * Custom utilities
+ */
+@layer utilities {
+  /* Smooth scroll */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+
+  /* Gradient backgrounds */
+  .gradient-primary {
+    @apply bg-gradient-to-br from-primary-700 via-primary-600 to-primary-500;
+  }
+
+  .gradient-dark {
+    @apply bg-gradient-to-br from-slate-900 via-primary-900 to-slate-800;
+  }
+
+  /* Glass morphism effect */
+  .glass {
+    @apply bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm;
+  }
+
+  /* Card hover effect - Business CRM style (no transforms) */
+  .card-hover {
+    @apply transition-colors duration-200 hover:shadow-md;
+  }
+
+  /* Hide scrollbar */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Auto-scrollbar: Hide by default, show on hover/scroll */
+  .auto-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+  .auto-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .auto-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .auto-scrollbar::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+  .auto-scrollbar:hover {
+    scrollbar-color: rgb(212 212 212) transparent;
+  }
+  .auto-scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: rgb(212 212 212);
+  }
+  .auto-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(180 180 180);
+  }
+  .dark .auto-scrollbar:hover {
+    scrollbar-color: #475569 transparent;
+  }
+  .dark .auto-scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: #475569;
+  }
+  .dark .auto-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+    background-color: #64748b;
+  }
+
+  /* Custom scrollbar styling */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+  }
+  .scrollbar-thumb-neutral-300::-webkit-scrollbar-thumb {
+    background-color: rgb(212 212 212);
+  }
+  .dark .scrollbar-thumb-neutral-300::-webkit-scrollbar-thumb {
+    background-color: transparent;
+  }
+  .scrollbar-thumb-slate-700::-webkit-scrollbar-thumb {
+    background-color: #334155;
+  }
+  .scrollbar-track-transparent::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Pipeline horizontal scrollbar - auto show on hover */
+  .pipeline-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+  .pipeline-scrollbar::-webkit-scrollbar {
+    height: 8px;
+  }
+  .pipeline-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .pipeline-scrollbar::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+  .pipeline-scrollbar:hover {
+    scrollbar-color: rgb(212 212 212) transparent;
+  }
+  .pipeline-scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: rgb(212 212 212);
+  }
+  .pipeline-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(180 180 180);
+  }
+  .dark .pipeline-scrollbar:hover {
+    scrollbar-color: #334155 transparent;
+  }
+  .dark .pipeline-scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: #334155;
+  }
+  .dark .pipeline-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+    background-color: #475569;
+  }
+
+  /* Stage column vertical scrollbar - auto show on hover */
+  .stage-column-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+  .stage-column-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  .stage-column-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .stage-column-scrollbar::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+  }
+  .stage-column-scrollbar:hover {
+    scrollbar-color: rgb(212 212 212) transparent;
+  }
+  .stage-column-scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: rgb(212 212 212);
+  }
+  .stage-column-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(180 180 180);
+  }
+  .dark .stage-column-scrollbar:hover {
+    scrollbar-color: #475569 transparent;
+  }
+  .dark .stage-column-scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: #475569;
+  }
+  .dark .stage-column-scrollbar:hover::-webkit-scrollbar-thumb:hover {
+    background-color: #64748b;
+  }
+}
+
+/**
+ * Animations
+ */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@layer utilities {
+  .animate-shimmer {
+    animation: shimmer 1.5s infinite;
+  }
+}
+
