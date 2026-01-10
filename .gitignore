@@ -4,6 +4,8 @@ server/
 
 # Documentation and old code
 client_docs/
+client/frontend_resume_guide.md
+client/DESIGN_SYSTEM.md
 
 # IDE and editor files
 .vscode/
