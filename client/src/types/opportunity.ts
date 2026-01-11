@@ -88,35 +88,35 @@ export type StageConfig = {
 export const STAGE_CONFIGS: Record<PipelineStage, StageConfig> = {
   [PipelineStage.LEADS_INTEREST]: {
     id: PipelineStage.LEADS_INTEREST,
-    label: 'Leads - Interest',
+    label: 'Interest',
     color: 'text-blue-600 dark:text-blue-400',
     bgColor: 'bg-blue-100 dark:bg-blue-900/30', // Soft blue
     order: 0,
   },
   [PipelineStage.PROSPECT_QUOTE]: {
     id: PipelineStage.PROSPECT_QUOTE,
-    label: 'Prospect - Quote',
+    label: 'Quote',
     color: 'text-orange-600 dark:text-orange-400',
     bgColor: 'bg-orange-100 dark:bg-orange-900/30', // Light orange
     order: 1,
   },
   [PipelineStage.PROSPECT_APP_SIGNED]: {
     id: PipelineStage.PROSPECT_APP_SIGNED,
-    label: 'Prospect - App Signed',
+    label: 'App Signed',
     color: 'text-orange-600 dark:text-orange-400',
     bgColor: 'bg-orange-200 dark:bg-orange-900/40', // Different light orange shade
     order: 2,
   },
   [PipelineStage.PROSPECT_UNDERWRITING]: {
     id: PipelineStage.PROSPECT_UNDERWRITING,
-    label: 'Prospect - Underwriting',
+    label: 'Underwriting',
     color: 'text-orange-600 dark:text-orange-400',
     bgColor: 'bg-orange-300 dark:bg-orange-900/50', // Different light orange shade
     order: 3,
   },
   [PipelineStage.CLIENT_WON_IN_FORCE]: {
     id: PipelineStage.CLIENT_WON_IN_FORCE,
-    label: 'Client Won - In Force',
+    label: 'In Force',
     color: 'text-green-600 dark:text-green-400',
     bgColor: 'bg-green-100 dark:bg-green-900/30', // Soft green
     order: 4,
