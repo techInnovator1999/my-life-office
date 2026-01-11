@@ -52,24 +52,26 @@ export function Pipeline() {
 
   return (
     <div className="space-y-3">
-      {/* Page Header - Compact */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold text-text-main dark:text-white">
+      {/* Page Header - Responsive */}
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+        <div className="flex flex-col">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-text-main dark:text-white">
             Opportunities Pipeline
           </h1>
-          <p className="text-xs text-gray-700 dark:text-gray-300 mt-0.5">
+          <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 mt-0.5">
             Manage your sales opportunities
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <button className="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium shadow-sm hover:bg-primary-hover hover:shadow-md active:bg-primary-800 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200">
+
+        {/* Action Buttons - Right of heading on desktop/tablet, below on mobile */}
+        <div className="flex items-stretch gap-2 w-full md:w-auto md:flex-shrink-0">
+          <button className="flex-1 md:flex-none md:px-4 px-4 py-2 h-10 bg-primary text-white rounded-md text-sm font-medium shadow-sm hover:bg-primary-hover hover:shadow-md active:bg-primary-800 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 flex items-center justify-center">
             <span className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-[16px]">add</span>
               <span>Add Contact</span>
             </span>
           </button>
-          <button className="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium shadow-sm hover:bg-primary-hover hover:shadow-md active:bg-primary-800 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200">
+          <button className="flex-1 md:flex-none md:px-4 px-4 py-2 h-10 bg-primary text-white rounded-md text-sm font-medium shadow-sm hover:bg-primary-hover hover:shadow-md active:bg-primary-800 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-200 flex items-center justify-center">
             <span className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-[16px]">add</span>
               <span>New Opportunity</span>

@@ -179,9 +179,9 @@ export function KanbanBoard({
               key={category.id}
               className={`flex-shrink-0 flex gap-4 border-2 ${categoryBorderClass} rounded-xl p-4 ${categoryBgClass}`}
             >
-              {/* Category Header - Vertical on left */}
+              {/* Category Header - Vertical on left (desktop only, hidden on mobile) */}
               <div
-                className={`flex-shrink-0 w-20 flex items-center justify-center border-r ${separatorBorderClass} pr-4`}
+                className={`hidden md:flex flex-shrink-0 w-20 items-center justify-center border-r ${separatorBorderClass} pr-4`}
               >
                 <h2
                   className={`text-base font-bold transform -rotate-90 whitespace-nowrap ${categoryColors.labelColor}`}
@@ -204,6 +204,7 @@ export function KanbanBoard({
                       opportunities={groupedOpportunities[stage]}
                       onOpportunityClick={onOpportunityClick}
                       categoryId={category.id as PipelineCategory}
+                      categoryLabel={category.label}
                     />
                   </SortableContext>
                 ))}
