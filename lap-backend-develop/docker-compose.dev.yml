@@ -1,0 +1,17 @@
+services:
+  backend:
+    container_name: lap-backend-dev
+    image: sjc.vultrcr.com/alvinregistry/lap-backend:dev
+    labels:
+      - 'com.lap.environment=dev'
+    env_file:
+      - .env
+    volumes:
+      - /opt/lap/dev/.env:/usr/src/app/.env
+    restart: always
+    networks:
+      - nginx-network
+
+networks:
+  nginx-network:
+    external: true

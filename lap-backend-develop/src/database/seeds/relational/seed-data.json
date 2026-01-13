@@ -1,0 +1,45 @@
+{
+  "Subscriptions": ["free", "bronze", "silver", "gold", "platinum"],
+  "Services": ["Life Insurance", "Annuity"],
+  "Brokers": ["Brokers Alliance"],
+  "Companies": [
+        {
+          "Name": "Master Agency",
+          "MasterPaycodes": [
+            { "Name": "Broker", "Value": "Broker" },
+            { "Name": "General Agency", "Value": "General Agency" },
+            { "Name": "Regional Agency Manager", "Value": "Regional Agency Manager" },
+            { "Name": "Title-100", "Value": "Street-Level", "Percentage": "100" },
+            { "Name": "Title-95", "Value": "Level-95", "Percentage": "95" },
+            { "Name": "Title-90", "Value": "Level-90", "Percentage": "90" },
+            { "Name": "Title-85", "Value": "Level-85", "Percentage": "85" },
+            { "Name": "Title-80", "Value": "Level-80", "Percentage": "80" },
+            { "Name": "Title-75", "Value": "Level-75", "Percentage": "75" },
+            { "Name": "Title-70", "Value": "Level-70", "Percentage": "70" },
+            { "Name": "Title-65", "Value": "Level-65", "Percentage": "65" },
+            { "Name": "Title-60", "Value": "Level-60", "Percentage": "60" },
+            { "Name": "Title-55", "Value": "Level-55", "Percentage": "55" },
+            { "Name": "Title-50", "Value": "Level-50", "Percentage": "50" }
+          ]
+        },
+        {
+            "Name": "Strategic Choices Financial",
+            "MasterPaycodes": [
+                { "Name": "Broker", "Value": "Diamond" },
+                { "Name": "General Agency", "Value": "General Agency" },
+                { "Name": "Regional Agency Manager", "Value": "Regional Agency Manager" },
+                { "Name": "Title-100", "Value": "Agency Manager", "Percentage": "100" },
+                { "Name": "Title-95", "Value": "-", "Percentage": "95" },
+                { "Name": "Title-90", "Value": "Senior Insurance Advisor", "Percentage": "90" },
+                { "Name": "Title-85", "Value": "-", "Percentage": "85" },
+                { "Name": "Title-80", "Value": "Insurance Advisor", "Percentage": "80" },
+                { "Name": "Title-75", "Value": "-", "Percentage": "75" },
+                { "Name": "Title-70", "Value": "Sr. Associate Agent", "Percentage": "70" },
+                { "Name": "Title-65", "Value": "-", "Percentage": "65" },
+                { "Name": "Title-60", "Value": "Jr. Associate Agent", "Percentage": "60" },
+                { "Name": "Title-55", "Value": "-", "Percentage": "55" },
+                { "Name": "Title-50", "Value": "Associate Agent", "Percentage": "50" }
+            ]
+        }
+  ]
+}

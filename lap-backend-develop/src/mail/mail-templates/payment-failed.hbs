@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <meta charset='UTF-8' />
+    <title>Payment Failed Notification</title>
+    <style>
+      body { font-family: Arial, sans-serif; color: #333; line-height: 1.6; }
+      .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px;
+      border: 1px solid #e0e0e0; } .header { text-align: center; padding: 10px
+      0; } .content { padding: 20px 0; } .button { background-color: #d9534f;
+      color: white; text-decoration: none; padding: 10px 20px; border-radius:
+      5px; }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='header'>
+        <h2>Payment Failed Notification</h2>
+      </div>
+      <div class='content'>
+        <p>Dear {{userName}},</p>
+        <p>We’re reaching out to inform you that the payment for your order
+          (Order No.
+          {{orderNo}}) on
+          {{orderDate}}
+          was unsuccessful.</p>
+        <p><strong>Order Details:</strong></p>
+        <ul>
+          <li>Plan: {{planName}}</li>
+          <li>Plan Price: ${{planPrice}}</li>
+          <li>Total Amount: ${{totalAmount}}</li>
+          <li>Delivery Option: {{deliveryOption}}</li>
+          <li>Promo Code: {{promoCode}}</li>
+        </ul>
+        <p>If you’d like to try the payment again or if you have questions,
+          please don't hesitate to reach out to our support team.</p>
+        <p>Thank you for choosing Life Agent Portal. We appreciate your business
+          and look forward to helping you.</p>
+      </div>
+      <footer>
+        <p>If you received this email by mistake or have any questions, please
+          contact our support team.</p>
+      </footer>
+    </div>
+  </body>
+</html>

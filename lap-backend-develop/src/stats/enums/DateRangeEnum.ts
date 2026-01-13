@@ -1,0 +1,6 @@
+export enum DateRangeEnum {
+  CURRENT_MONTH = 'CURRENT_MONTH',
+  LAST_MONTH = 'LAST_MONTH',
+  LAST_3_MONTHS = 'LAST_3_MONTHS',
+  LAST_6_MONTHS = 'LAST_6_MONTHS',
+}

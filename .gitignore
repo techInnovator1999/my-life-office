@@ -1,5 +1,4 @@
 # Backend directories (if not pushing backend)
-lap-backend-develop/
 server/
 
 # Documentation and old code
@@ -45,4 +44,4 @@ temp/
 *.pem
 *.key
 *.cert
-
+CRM-todos

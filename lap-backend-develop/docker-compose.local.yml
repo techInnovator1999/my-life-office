@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: lap-backend-local
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    volumes:
+      - ./.env:/usr/src/app/.env
+    environment:
+      DATABASE_HOST: host.docker.internal
+      REDIS_HOST: host.docker.internal
+    ports:
+      - '${APP_PORT}:${APP_PORT}'
+    restart: unless-stopped
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'

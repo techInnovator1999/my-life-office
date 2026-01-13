@@ -1,0 +1,7 @@
+export const StatusEnum = {
+  ACTIVE: 'ad0691fd-2d4c-42c6-9ff0-e47bbf60c224',
+  INACTIVE: '1b3d5416-2531-47be-a659-2ab101ace57f',
+  REQUIRED_PASSWORD_CONFIG: '2a9a2f37-cdde-4a19-ae23-bb2cb927c119',
+  ABANDONED: 'fbd73f6e-2291-4578-ae2f-46849ce3ad46',
+  SUSPENDED: '1aeac248-38fb-43a1-9e95-66393f832491',
+};

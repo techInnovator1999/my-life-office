@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/store/authContext'
 
 type PrivateRouteProps = {
@@ -6,7 +6,8 @@ type PrivateRouteProps = {
 }
 
 export function PrivateRoute({ children }: PrivateRouteProps) {
-  const { isAuthenticated, isLoading } = useAuth()
+  const { isAuthenticated, isLoading, user } = useAuth()
+  const location = useLocation()
 
   if (isLoading) {
     return (
@@ -18,6 +19,16 @@ export function PrivateRoute({ children }: PrivateRouteProps) {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
+  }
+
+  // If user is not approved and not on profile page, redirect to profile
+  if (user && !user.isApproved && location.pathname !== '/profile') {
+    return <Navigate to="/profile" replace />
+  }
+
+  // If user is approved and on profile page, redirect to dashboard
+  if (user && user.isApproved && location.pathname === '/profile') {
+    return <Navigate to="/dashboard" replace />
   }
 
   return <>{children}</>

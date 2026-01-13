@@ -4,6 +4,7 @@ import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
 import { validators, type ValidationResult } from '@/utils/validators'
 import { useAuth } from '@/store/authContext'
+import { login as loginService, confirmEmail } from '@/services/authService'
 import logoMain from '@/assets/images/logo-main.png'
 import logoMainLight from '@/assets/images/logo-main-light.png'
 
@@ -14,7 +15,7 @@ type FormErrors = {
 
 export function Login() {
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { login: authLogin, user: authUser } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -24,6 +25,11 @@ export function Login() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isDark, setIsDark] = useState(false)
+  const [emailNotVerified, setEmailNotVerified] = useState(false)
+  const [verificationCode, setVerificationCode] = useState('')
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [verificationError, setVerificationError] = useState<string | null>(null)
+  const [isVerified, setIsVerified] = useState(false)
 
   // Detect theme changes
   useEffect(() => {
@@ -108,14 +114,42 @@ export function Login() {
     // Only submit if form is valid
     if (isFormValid() && Object.keys(newErrors).length === 0) {
       setIsLoading(true)
+      setEmailNotVerified(false)
       try {
-        await login(formData.email, formData.password)
+        const response = await loginService({ email: formData.email, password: formData.password })
+        
+        // Check if email is verified
+        const statusId = response.user.status?.id
+        const INACTIVE_STATUS_ID = '1b3d5416-2531-47be-a659-2ab101ace57f' // INACTIVE status ID
+        
+        if (statusId === INACTIVE_STATUS_ID) {
+          // Email not verified - show message only
+          setEmailNotVerified(true)
+          setIsLoading(false)
+          return
+        }
+        
+        // Store token and user in auth context
+        await authLogin(formData.email, formData.password)
+        
+        // Email verified - check if approved
+        if (!response.user.isApproved) {
+          // Email verified but not approved - redirect to profile
+          navigate('/profile')
+          return
+        }
+        
+        // Fully approved - go to dashboard
         navigate('/dashboard')
       } catch (error) {
-        setErrors({
-          email: 'Invalid email or password',
-          password: 'Invalid email or password',
-        })
+        if (error instanceof Error && error.message === 'EMAIL_NOT_VERIFIED') {
+          setEmailNotVerified(true)
+        } else {
+          setErrors({
+            email: error instanceof Error ? error.message : 'Invalid email or password',
+            password: error instanceof Error ? error.message : 'Invalid email or password',
+          })
+        }
       } finally {
         setIsLoading(false)
       }
@@ -146,8 +180,104 @@ export function Login() {
               </div>
 
 
+              {/* Email Not Verified Message */}
+              {emailNotVerified && !isVerified && (
+                <div className="flex flex-col gap-4">
+                  <div className="px-4 py-4 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                    <div className="flex items-start gap-3">
+                      <span className="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[24px]">
+                        mail
+                      </span>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                          Please verify your email address
+                        </p>
+                        <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                          We've sent a verification code to <strong>{formData.email}</strong>. Please enter the code below to verify your email address.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Verification Code Input */}
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-semibold text-neutral-900 dark:text-neutral-200 ml-1">
+                      Verification Code
+                      <span className="text-red-500 ml-1">*</span>
+                    </label>
+                    <div className="flex gap-3">
+                      <Input
+                        type="text"
+                        placeholder="Enter 6-digit code"
+                        value={verificationCode}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, '').slice(0, 6)
+                          setVerificationCode(value)
+                          setVerificationError(null)
+                        }}
+                        maxLength={6}
+                        className="flex-1"
+                      />
+                      <Button
+                        type="button"
+                        onClick={async () => {
+                          if (verificationCode.length !== 6) {
+                            setVerificationError('Please enter a 6-digit verification code')
+                            return
+                          }
+                          
+                          setIsVerifying(true)
+                          setVerificationError(null)
+                          
+                          try {
+                            await confirmEmail(formData.email, verificationCode)
+                            setIsVerified(true)
+                            setEmailNotVerified(false)
+                            // After verification, try to login again
+                            await authLogin(formData.email, formData.password)
+                            navigate('/profile')
+                          } catch (error) {
+                            setVerificationError(error instanceof Error ? error.message : 'Invalid verification code')
+                          } finally {
+                            setIsVerifying(false)
+                          }
+                        }}
+                        isLoading={isVerifying}
+                        disabled={verificationCode.length !== 6 || isVerifying}
+                        className="px-6"
+                      >
+                        Verify
+                      </Button>
+                    </div>
+                    {verificationError && (
+                      <p className="text-sm text-red-600 dark:text-red-400 ml-1">{verificationError}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Email Verified Success Message */}
+              {isVerified && (
+                <div className="px-4 py-4 rounded-md bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                  <div className="flex items-start gap-3">
+                    <span className="material-symbols-outlined text-green-600 dark:text-green-400 text-[24px]">
+                      check_circle
+                    </span>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                        Email verified successfully!
+                      </p>
+                      <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                        Redirecting you to your profile...
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Form */}
-              <form onSubmit={handleSubmit} className="flex flex-col gap-5 mt-2">
+              {!emailNotVerified && (
+                <form onSubmit={handleSubmit} className="flex flex-col gap-5 mt-2">
                 {/* Email Field */}
                 <Input
                   label="Email"
@@ -230,6 +360,7 @@ export function Login() {
                   </span>
                 </Button>
               </form>
+              )}
             </div>
           </div>
 

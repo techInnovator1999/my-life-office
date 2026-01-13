@@ -1,0 +1,17 @@
+services:
+  backend:
+    container_name: lap-backend-staging
+    image: sjc.vultrcr.com/alvinregistry/lap-backend:staging
+    labels:
+      - 'com.lap.environment=staging'
+    env_file:
+      - .env
+    volumes:
+      - /opt/lap/staging/.env:/usr/src/app/.env
+    restart: always
+    networks:
+      - nginx-network
+
+networks:
+  nginx-network:
+    external: true

@@ -6,7 +6,17 @@ type User = {
   firstName: string
   lastName: string
   email: string
-  role: 'ADMIN' | 'AGENT'
+  role: {
+    id: string
+    name?: string
+  }
+  status: {
+    id: string
+    name?: string
+  }
+  isApproved: boolean
+  verificationCode?: string | null
+  verificationExpires?: Date | null
 }
 
 type AuthContextType = {
@@ -47,8 +57,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string) => {
     const response = await loginService({ email, password })
     
-    // Store token
-    localStorage.setItem('token', response.token)
+    // Store token (if not already stored)
+    if (!localStorage.getItem('token')) {
+      localStorage.setItem('token', response.token)
+    }
+    if (response.refreshToken && !localStorage.getItem('refreshToken')) {
+      localStorage.setItem('refreshToken', response.refreshToken)
+    }
     
     // Set user
     setUser(response.user)

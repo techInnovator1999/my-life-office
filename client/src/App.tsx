@@ -14,6 +14,7 @@ import { Users } from './pages/admin/users/Users'
 import { Individuals } from './pages/opportunities/Individuals'
 import { Businesses } from './pages/opportunities/Businesses'
 import { Employees } from './pages/opportunities/Employees'
+import { Profile } from './pages/profile/Profile'
 
 function App() {
   useEffect(() => {
@@ -22,12 +23,29 @@ function App() {
   }, [])
 
   return (
-    <BrowserRouter>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
       <AuthProvider>
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          
+          {/* Profile Route (for unapproved users) */}
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <MainLayout>
+                  <Profile />
+                </MainLayout>
+              </PrivateRoute>
+            }
+          />
 
           {/* Protected Routes */}
           <Route

@@ -126,7 +126,6 @@ export function Header({ onMenuClick }: HeaderProps) {
               <p className="text-sm font-semibold text-text-main dark:text-white">
                 {user?.firstName} {user?.lastName}
               </p>
-              <p className="text-xs text-text-muted dark:text-text-muted-dark">{user?.email}</p>
             </div>
             <span className="material-symbols-outlined text-[20px] text-text-muted dark:text-text-muted-dark">
               expand_more
@@ -141,7 +140,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                   <p className="text-sm font-semibold text-text-main dark:text-white">
                     {user?.firstName} {user?.lastName}
                   </p>
-                  <p className="text-xs text-text-muted dark:text-text-muted-dark">{user?.email}</p>
+                  <p className="text-xs text-text-muted dark:text-text-muted-dark mt-0.5">{user?.email}</p>
                 </div>
                 <button
                   onClick={() => {

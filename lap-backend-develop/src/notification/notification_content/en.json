@@ -1,0 +1,22 @@
+[
+  {
+    "Key": "ab101",
+    "Content": "{FromUserName} has registered.",
+    "Translation": "{FromUserName}  has registered."
+  },
+  {
+    "Key": "ab102",
+    "Content": "New payment recieved from user: {FromUserName}",
+    "Translation": "{FromUserName} has checked out"
+  },
+  {
+    "Key": "ab103",
+    "Content": "{FromUserName} has completed interview form",
+    "Translation": "{FromUserName} has completed interview form"
+  },
+  {
+    "Key": "ab104",
+    "Content": "{FromUserName} has created a new support request",
+    "Translation": "{FromUserName} has created a new support request"
+  }
+]

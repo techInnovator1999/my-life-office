@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/common/Button'
 import { Input } from '@/components/common/Input'
+import { Select, type SelectOption } from '@/components/common/Select'
 import { PasswordStrength } from '@/components/common/PasswordStrength'
 import { validators, type ValidationResult } from '@/utils/validators'
+import { getLicenseTypes } from '@/services/licenseTypeService'
+import { crmRegister } from '@/services/crmAuthService'
+import { confirmEmail } from '@/services/authService'
 import logoMain from '@/assets/images/logo-main.png'
 import logoMainLight from '@/assets/images/logo-main-light.png'
 
@@ -11,15 +15,18 @@ type FormErrors = {
   firstName?: string
   lastName?: string
   email?: string
+  primaryLicenseType?: string
   password?: string
   confirmPassword?: string
 }
 
 export function Signup() {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
+    primaryLicenseType: '',
     password: '',
     confirmPassword: '',
   })
@@ -30,6 +37,14 @@ export function Signup() {
   const [agreeToTerms, setAgreeToTerms] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isDark, setIsDark] = useState(false)
+  const [licenseTypeOptions, setLicenseTypeOptions] = useState<SelectOption[]>([])
+  const [isLoadingLicenseTypes, setIsLoadingLicenseTypes] = useState(true)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [isRegistrationSuccess, setIsRegistrationSuccess] = useState(false)
+  const [verificationCode, setVerificationCode] = useState('')
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [verificationError, setVerificationError] = useState<string | null>(null)
+  const [isVerified, setIsVerified] = useState(false)
 
   // Detect theme changes
   useEffect(() => {
@@ -47,6 +62,39 @@ export function Signup() {
     return () => observer.disconnect()
   }, [])
 
+  // Fetch license types on mount
+  useEffect(() => {
+    const fetchLicenseTypes = async () => {
+      try {
+        setIsLoadingLicenseTypes(true)
+        const types = await getLicenseTypes()
+        
+        if (types && Array.isArray(types) && types.length > 0) {
+          const options = types.map((type) => ({
+            value: type.value,
+            label: type.label,
+          }))
+          setLicenseTypeOptions(options)
+        } else {
+          setErrors((prev) => ({
+            ...prev,
+            primaryLicenseType: 'No license types available. Please contact support.',
+          }))
+        }
+      } catch (error) {
+        console.error('Failed to fetch license types:', error)
+        setErrors((prev) => ({
+          ...prev,
+          primaryLicenseType: error instanceof Error ? error.message : 'Failed to load license types. Please refresh the page.',
+        }))
+      } finally {
+        setIsLoadingLicenseTypes(false)
+      }
+    }
+
+    fetchLicenseTypes()
+  }, [])
+
   // Real-time validation
   const validateField = (name: string, value: string): ValidationResult => {
     switch (name) {
@@ -56,6 +104,8 @@ export function Signup() {
         return validators.combine(validators.required, validators.minLength(2))(value)
       case 'email':
         return validators.combine(validators.required, validators.email)(value)
+      case 'primaryLicenseType':
+        return validators.required(value)
       case 'password':
         return validators.combine(validators.required, validators.minLength(8))(value)
       case 'confirmPassword':
@@ -108,6 +158,7 @@ export function Signup() {
       formData.firstName.trim() !== '' &&
       formData.lastName.trim() !== '' &&
       formData.email.trim() !== '' &&
+      formData.primaryLicenseType.trim() !== '' &&
       formData.password.trim() !== '' &&
       formData.confirmPassword.trim() !== '' &&
       Object.values(errors).every((error) => !error)
@@ -116,9 +167,10 @@ export function Signup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setSubmitError(null)
 
     // Mark all fields as touched
-    const allFields = ['firstName', 'lastName', 'email', 'password', 'confirmPassword']
+    const allFields = ['firstName', 'lastName', 'email', 'primaryLicenseType', 'password', 'confirmPassword']
     const newTouched: Record<string, boolean> = {}
     const newErrors: FormErrors = {}
 
@@ -136,8 +188,25 @@ export function Signup() {
     // Only submit if form is valid
     if (isFormValid() && Object.keys(newErrors).length === 0) {
       setIsLoading(true)
-      // TODO: Implement signup logic
-      setTimeout(() => setIsLoading(false), 1000)
+      try {
+        // Save primaryLicenseType to localStorage for profile page
+        localStorage.setItem('primaryLicenseType', formData.primaryLicenseType)
+        
+        await crmRegister({
+          firstName: formData.firstName.trim(),
+          lastName: formData.lastName.trim(),
+          email: formData.email.trim(),
+          password: formData.password,
+          confirm_password: formData.confirmPassword,
+          primaryLicenseType: formData.primaryLicenseType,
+        })
+
+        // Success - show success message
+        setIsRegistrationSuccess(true)
+      } catch (error) {
+        setSubmitError(error instanceof Error ? error.message : 'Registration failed. Please try again.')
+        setIsLoading(false)
+      }
     }
   }
 
@@ -150,23 +219,135 @@ export function Signup() {
           {/* Main Form Content */}
           <div className="flex grow flex-col justify-center px-8 py-6 lg:px-12">
             <div className="mx-auto w-full max-w-[420px] flex flex-col gap-6">
-              {/* Logo */}
-              <div className="flex flex-col gap-2 items-center">
-                <img
-                  src={isDark ? logoMainLight : logoMain}
-                  alt="CRM Nexus Logo"
-                  className={`${isDark ? 'w-[268px] h-16' : 'w-[268px] h-12'} mb-2 object-contain`}
-                />
-                <h1 className="text-2xl font-bold leading-tight tracking-tight text-neutral-900 dark:text-white">
-                  Create your CRM Account
-                </h1>
-                <p className="text-base font-medium text-neutral-500 dark:text-neutral-400 text-center">
-                  Get ready to be captivated by our amazing CRM and Agent management office
-                </p>
-              </div>
+              {/* Success Screen */}
+              {isRegistrationSuccess ? (
+                <div className="flex flex-col items-center justify-center gap-6 py-8">
+                  {!isVerified ? (
+                    <>
+                      {/* Success Icon */}
+                      <div className="flex items-center justify-center w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30">
+                        <span className="material-symbols-outlined text-5xl text-green-600 dark:text-green-400">
+                          mail
+                        </span>
+                      </div>
 
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="flex flex-col gap-5 mt-2">
+                      {/* Success Messages */}
+                      <div className="flex flex-col gap-4 text-center">
+                        <p className="text-base font-medium text-neutral-700 dark:text-neutral-300">
+                          Registration successful!
+                        </p>
+                        <p className="text-base font-medium text-neutral-700 dark:text-neutral-300">
+                          We've sent a verification code to <strong>{formData.email}</strong>. Please enter the code below to verify your email address.
+                        </p>
+                      </div>
+
+                      {/* Verification Code Input */}
+                      <div className="w-full max-w-md flex flex-col gap-2">
+                        <label className="text-sm font-semibold text-neutral-900 dark:text-neutral-200 ml-1">
+                          Verification Code
+                          <span className="text-red-500 ml-1">*</span>
+                        </label>
+                        <div className="flex gap-3">
+                          <Input
+                            type="text"
+                            placeholder="Enter 6-digit code"
+                            value={verificationCode}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/\D/g, '').slice(0, 6)
+                              setVerificationCode(value)
+                              setVerificationError(null)
+                            }}
+                            maxLength={6}
+                            className="flex-1"
+                          />
+                          <Button
+                            type="button"
+                            onClick={async () => {
+                              if (verificationCode.length !== 6) {
+                                setVerificationError('Please enter a 6-digit verification code')
+                                return
+                              }
+                              
+                              setIsVerifying(true)
+                              setVerificationError(null)
+                              
+                              try {
+                                await confirmEmail(formData.email, verificationCode)
+                                setIsVerified(true)
+                                // Redirect to login after successful verification
+                                setTimeout(() => {
+                                  navigate('/login')
+                                }, 2000)
+                              } catch (error) {
+                                setVerificationError(error instanceof Error ? error.message : 'Invalid verification code')
+                              } finally {
+                                setIsVerifying(false)
+                              }
+                            }}
+                            isLoading={isVerifying}
+                            disabled={verificationCode.length !== 6 || isVerifying}
+                            className="px-6"
+                          >
+                            Verify
+                          </Button>
+                        </div>
+                        {verificationError && (
+                          <p className="text-sm text-red-600 dark:text-red-400 ml-1">{verificationError}</p>
+                        )}
+                        <p className="text-xs text-neutral-500 dark:text-neutral-400 text-center mt-2">
+                          Didn't receive the code? Check your spam folder or{' '}
+                          <Link
+                            to="/login"
+                            className="font-bold text-primary hover:text-primary/80 hover:underline"
+                          >
+                            proceed to login
+                          </Link>
+                        </p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Verified Success Icon */}
+                      <div className="flex items-center justify-center w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30">
+                        <span className="material-symbols-outlined text-5xl text-green-600 dark:text-green-400">
+                          check_circle
+                        </span>
+                      </div>
+
+                      {/* Verified Success Messages */}
+                      <div className="flex flex-col gap-4 text-center">
+                        <p className="text-base font-medium text-neutral-700 dark:text-neutral-300">
+                          Email verified successfully!
+                        </p>
+                        <p className="text-base font-medium text-neutral-700 dark:text-neutral-300">
+                          Redirecting you to login...
+                        </p>
+                        <p className="text-sm font-normal text-neutral-600 dark:text-neutral-400 leading-relaxed max-w-md">
+                          You will have limited Agent portal access until your account is approved by the CRM team, with 1-2 business days.
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <>
+                  {/* Logo */}
+                  <div className="flex flex-col gap-2 items-center">
+                    <img
+                      src={isDark ? logoMainLight : logoMain}
+                      alt="CRM Nexus Logo"
+                      className={`${isDark ? 'w-[268px] h-16' : 'w-[268px] h-12'} mb-2 object-contain`}
+                    />
+                    <h1 className="text-2xl font-bold leading-tight tracking-tight text-neutral-900 dark:text-white">
+                      Create your CRM Account
+                    </h1>
+                    <p className="text-base font-medium text-neutral-500 dark:text-neutral-400 text-center">
+                      Get ready to be captivated by our amazing CRM and Agent management office
+                    </p>
+                  </div>
+
+                  {/* Form */}
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-5 mt-2">
                 {/* Name Fields Row */}
                 <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                   {/* First Name */}
@@ -207,6 +388,20 @@ export function Signup() {
                   onBlur={() => handleBlur('email')}
                   error={errors.email}
                   required
+                  autoComplete="email"
+                />
+
+                {/* License Type Field */}
+                <Select
+                  label="Primary License Type"
+                  icon="badge"
+                  options={licenseTypeOptions}
+                  value={formData.primaryLicenseType}
+                  onChange={(value) => handleChange('primaryLicenseType', value)}
+                  onBlur={() => handleBlur('primaryLicenseType')}
+                  error={errors.primaryLicenseType}
+                  required
+                  placeholder={isLoadingLicenseTypes ? 'Loading...' : 'Select license type'}
                 />
 
                 {/* Password Fields Row */}
@@ -225,6 +420,7 @@ export function Signup() {
                         onChange={(e) => handleChange('password', e.target.value)}
                         onBlur={() => handleBlur('password')}
                         error={errors.password}
+                        autoComplete="new-password"
                       />
                       <button
                         type="button"
@@ -253,6 +449,7 @@ export function Signup() {
                         onChange={(e) => handleChange('confirmPassword', e.target.value)}
                         onBlur={() => handleBlur('confirmPassword')}
                         error={errors.confirmPassword}
+                        autoComplete="new-password"
                       />
                       <button
                         type="button"
@@ -293,11 +490,18 @@ export function Signup() {
                   </div>
                 </div>
 
+                {/* Submit Error */}
+                {submitError && (
+                  <div className="px-4 py-3 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                    <p className="text-sm text-red-600 dark:text-red-400">{submitError}</p>
+                  </div>
+                )}
+
                 {/* Submit Button */}
                 <Button
                   type="submit"
                   isLoading={isLoading}
-                  disabled={!isFormValid()}
+                  disabled={!isFormValid() || isLoadingLicenseTypes}
                   className="mt-2 flex w-full items-center justify-center"
                 >
                   <span className="flex items-center gap-2">
@@ -308,6 +512,8 @@ export function Signup() {
                   </span>
                 </Button>
               </form>
+                </>
+              )}
             </div>
           </div>
 

@@ -19,6 +19,7 @@ type NavItem = {
 }
 
 const navItems: NavItem[] = [
+  { path: '/profile', label: 'Onboarding', icon: 'person' },
   { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
   { path: '/contacts', label: 'Contacts', icon: 'group' },
   { path: '/pipeline', label: 'Pipeline', icon: 'ads_click' },
@@ -115,27 +116,40 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
           {filteredNavItems.map((item) => {
             const isExpanded = expandedItems.has(item.label)
             const hasChildren = item.children && item.children.length > 0
+            const isUnapproved = user && !user.isApproved
+            const isOnboarding = item.path === '/profile'
+            const isDisabled = isUnapproved && !isOnboarding
 
             if (hasChildren) {
               return (
                 <div key={item.label}>
                   <button
-                    onClick={() => toggleExpand(item.label)}
+                    onClick={() => !isDisabled && toggleExpand(item.label)}
+                    disabled={isDisabled}
                     className={`w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded-md transition-colors ${
-                      isExpanded
-                        ? 'bg-primary text-white shadow-sm'
-                        : 'hover:bg-neutral-100 dark:hover:bg-slate-700 text-text-muted dark:text-text-muted-dark hover:text-text-main dark:hover:text-white'
+                      isDisabled
+                        ? 'opacity-50 cursor-not-allowed text-text-muted dark:text-text-muted-dark'
+                        : isExpanded
+                          ? 'bg-primary text-white shadow-sm'
+                          : 'hover:bg-neutral-100 dark:hover:bg-slate-700 text-text-muted dark:text-text-muted-dark hover:text-text-main dark:hover:text-white'
                     }`}
                   >
                     <div className="flex items-center gap-2">
                       <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
                       <span className="hidden lg:block font-medium text-sm">{item.label}</span>
                     </div>
-                    <span className="material-symbols-outlined text-[16px] hidden lg:block">
-                      {isExpanded ? 'expand_less' : 'expand_more'}
-                    </span>
+                    {!isDisabled && (
+                      <span className="material-symbols-outlined text-[16px] hidden lg:block">
+                        {isExpanded ? 'expand_less' : 'expand_more'}
+                      </span>
+                    )}
+                    {isDisabled && (
+                      <span className="material-symbols-outlined text-[16px] hidden lg:block text-text-muted dark:text-text-muted-dark">
+                        lock
+                      </span>
+                    )}
                   </button>
-                  {isExpanded && (
+                  {isExpanded && !isDisabled && (
                     <div className="ml-4 mt-1 space-y-1">
                       {item.children?.map((child) => (
                         <NavLink
@@ -167,22 +181,33 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
             return (
               <NavLink
                 key={item.path}
-                to={item.path!}
-                onClick={() => {
+                to={isDisabled ? '#' : item.path!}
+                onClick={(e) => {
+                  if (isDisabled) {
+                    e.preventDefault()
+                    return
+                  }
                   if (window.innerWidth < 1024) {
                     onClose()
                   }
                 }}
                 className={({ isActive }) =>
                   `flex items-center gap-2 px-2 py-1.5 rounded-md transition-colors ${
-                    isActive
-                      ? 'bg-primary text-white shadow-sm'
-                      : 'hover:bg-neutral-100 dark:hover:bg-slate-700 text-text-muted dark:text-text-muted-dark hover:text-text-main dark:hover:text-white'
+                    isDisabled
+                      ? 'opacity-50 cursor-not-allowed pointer-events-none'
+                      : isActive
+                        ? 'bg-primary text-white shadow-sm'
+                        : 'hover:bg-neutral-100 dark:hover:bg-slate-700 text-text-muted dark:text-text-muted-dark hover:text-text-main dark:hover:text-white'
                   }`
                 }
               >
                 <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
                 <span className="hidden lg:block font-medium text-sm">{item.label}</span>
+                {isDisabled && (
+                  <span className="material-symbols-outlined text-[14px] ml-auto hidden lg:block text-text-muted dark:text-text-muted-dark">
+                    lock
+                  </span>
+                )}
               </NavLink>
             )
           })}
@@ -204,7 +229,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               </p>
               <p className="text-xs text-text-muted dark:text-text-muted-dark truncate">{user?.email}</p>
               <span className="inline-block mt-0.5 px-1.5 py-0.5 text-xs font-medium rounded-full bg-primary/20 text-primary border border-primary/20">
-                {user?.role}
+                {user?.role?.name || 'AGENT'}
               </span>
             </div>
           </div>
