@@ -37,3 +37,4 @@ lerna-debug.log*
 /files
 
 /ormconfig.json
+/src/notification/fcmtoken.json

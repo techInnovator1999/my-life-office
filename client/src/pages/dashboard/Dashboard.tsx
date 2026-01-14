@@ -1,4 +1,5 @@
 import { useAuth } from '@/store/authContext'
+import { toTitleCase } from '@/utils/formatters'
 
 type StatCardProps = {
   title: string
@@ -42,7 +43,7 @@ export function Dashboard() {
           Dashboard
         </h1>
         <p className="text-text-muted dark:text-text-muted-dark mt-1">
-          Welcome back, {user?.firstName}! Here's what's happening today.
+          Welcome back, {toTitleCase(user?.firstName)}! Here's what's happening today.
         </p>
       </div>
 
@@ -134,13 +135,13 @@ export function Dashboard() {
         <div className="bg-white dark:bg-surface-dark rounded-lg shadow-sm border border-neutral-200 dark:border-slate-700 p-6">
           <h2 className="text-lg font-semibold text-text-main dark:text-white mb-4">Quick Actions</h2>
           <div className="grid grid-cols-2 gap-3">
-            <button className="flex flex-col items-center gap-2 p-4 rounded-lg border border-neutral-200 dark:border-slate-700 hover:border-primary hover:bg-primary/5 transition-colors">
+            <button className="flex flex-col items-center gap-2 p-4 rounded-lg border border-neutral-200 dark:border-slate-700 hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors">
               <span className="material-symbols-outlined text-2xl text-primary">
                 person_add
               </span>
               <span className="text-sm font-medium text-text-main dark:text-white">Add Contact</span>
             </button>
-            <button className="flex flex-col items-center gap-2 p-4 rounded-lg border border-neutral-200 dark:border-slate-700 hover:border-primary hover:bg-primary/5 transition-colors">
+            <button className="flex flex-col items-center gap-2 p-4 rounded-lg border border-neutral-200 dark:border-slate-700 hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors">
               <span className="material-symbols-outlined text-2xl text-primary">
                 add_circle
               </span>
@@ -148,13 +149,13 @@ export function Dashboard() {
                 New Opportunity
               </span>
             </button>
-            <button className="flex flex-col items-center gap-2 p-4 rounded-lg border border-neutral-200 dark:border-slate-700 hover:border-primary hover:bg-primary/5 transition-colors">
+            <button className="flex flex-col items-center gap-2 p-4 rounded-lg border border-neutral-200 dark:border-slate-700 hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors">
               <span className="material-symbols-outlined text-2xl text-primary">
                 sync
               </span>
               <span className="text-sm font-medium text-text-main dark:text-white">Sync Contacts</span>
             </button>
-            <button className="flex flex-col items-center gap-2 p-4 rounded-lg border border-neutral-200 dark:border-slate-700 hover:border-primary hover:bg-primary/5 transition-colors">
+            <button className="flex flex-col items-center gap-2 p-4 rounded-lg border border-neutral-200 dark:border-slate-700 hover:border-primary hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors">
               <span className="material-symbols-outlined text-2xl text-primary">
                 analytics
               </span>

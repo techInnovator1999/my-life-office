@@ -116,4 +116,8 @@ export class CreateUserDto {
   @ApiProperty({ required: false })
   @IsOptional()
   lastGoogleSyncAt?: Date | null;
+
+  @ApiProperty({ example: false, required: false })
+  @IsOptional()
+  crmAgent?: boolean;
 }

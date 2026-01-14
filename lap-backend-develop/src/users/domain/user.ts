@@ -129,4 +129,7 @@ export class User extends UserBase {
 
   @ApiProperty({ type: String })
   sponsoringAgentId?: string | null;
+
+  @ApiProperty({ type: Boolean })
+  crmAgent?: boolean;
 }

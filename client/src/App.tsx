@@ -6,11 +6,16 @@ import { PrivateRoute } from './routes/PrivateRoute'
 import { MainLayout } from './components/layout/MainLayout'
 import { Login } from './pages/auth/Login'
 import { Signup } from './pages/auth/Signup'
+import { ForgotPassword } from './pages/auth/ForgotPassword'
+import { ResetPassword } from './pages/auth/ResetPassword'
 import { Dashboard } from './pages/dashboard/Dashboard'
 import { Contacts } from './pages/contacts/Contacts'
 import { Pipeline } from './pages/pipeline/Pipeline'
 import { Settings } from './pages/settings/Settings'
 import { Users } from './pages/admin/users/Users'
+import { Agents } from './pages/admin/agents/Agents'
+import { Pending } from './pages/admin/agents/Pending'
+import { AgentDetail } from './pages/admin/agents/AgentDetail'
 import { Individuals } from './pages/opportunities/Individuals'
 import { Businesses } from './pages/opportunities/Businesses'
 import { Employees } from './pages/opportunities/Employees'
@@ -23,17 +28,19 @@ function App() {
   }, [])
 
   return (
-    <BrowserRouter
-      future={{
-        v7_startTransition: true,
-        v7_relativeSplatPath: true,
-      }}
-    >
-      <AuthProvider>
+    <AuthProvider>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <Routes>
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           
           {/* Profile Route (for unapproved users) */}
           <Route
@@ -99,6 +106,36 @@ function App() {
             }
           />
           <Route
+            path="/admin/agents"
+            element={
+              <PrivateRoute>
+                <MainLayout>
+                  <Agents />
+                </MainLayout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/agents/pending"
+            element={
+              <PrivateRoute>
+                <MainLayout>
+                  <Pending />
+                </MainLayout>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/agents/:id"
+            element={
+              <PrivateRoute>
+                <MainLayout>
+                  <AgentDetail />
+                </MainLayout>
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="/opportunities/individuals"
             element={
               <PrivateRoute>
@@ -132,8 +169,8 @@ function App() {
           {/* Default redirect */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
 

@@ -211,6 +211,9 @@ export class UserEntity extends EntityRelationalHelper implements User {
   @Column({ type: 'uuid', nullable: true })
   sponsoringAgentId?: string | null;
 
+  @Column({ type: Boolean, default: false })
+  crmAgent: boolean = false;
+
   @CreateDateColumn()
   createdAt: Date;
 

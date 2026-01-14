@@ -15,7 +15,7 @@ type FormErrors = {
 
 export function Login() {
   const navigate = useNavigate()
-  const { login: authLogin, user: authUser } = useAuth()
+  const { login: authLogin } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -24,6 +24,7 @@ export function Login() {
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
   const [isDark, setIsDark] = useState(false)
   const [emailNotVerified, setEmailNotVerified] = useState(false)
   const [verificationCode, setVerificationCode] = useState('')
@@ -129,8 +130,11 @@ export function Login() {
           return
         }
         
-        // Store token and user in auth context
-        await authLogin(formData.email, formData.password)
+        // Store token and user in auth context with remember me preference
+        await authLogin(formData.email, formData.password, rememberMe)
+        
+        // Small delay to ensure state is updated before navigation
+        await new Promise(resolve => setTimeout(resolve, 100))
         
         // Email verified - check if approved
         if (!response.user.isApproved) {
@@ -145,10 +149,29 @@ export function Login() {
         if (error instanceof Error && error.message === 'EMAIL_NOT_VERIFIED') {
           setEmailNotVerified(true)
         } else {
-          setErrors({
-            email: error instanceof Error ? error.message : 'Invalid email or password',
-            password: error instanceof Error ? error.message : 'Invalid email or password',
-          })
+          // Parse error message to determine if it's email or password error
+          const errorMessage = error instanceof Error ? error.message : 'Invalid email or password'
+          
+          // Check error type and set appropriate field errors
+          if (errorMessage.includes('email is not recognized') || errorMessage.includes('not recognized')) {
+            // Email not found - show error on email field only
+            setErrors({
+              email: errorMessage,
+              password: undefined,
+            })
+          } else if (errorMessage.includes('Incorrect password') || errorMessage.toLowerCase().includes('password')) {
+            // Password incorrect - show error on password field only
+            setErrors({
+              email: undefined,
+              password: errorMessage,
+            })
+          } else {
+            // Generic error - show on email field only (not both)
+            setErrors({
+              email: errorMessage,
+              password: undefined,
+            })
+          }
         }
       } finally {
         setIsLoading(false)
@@ -233,8 +256,8 @@ export function Login() {
                             await confirmEmail(formData.email, verificationCode)
                             setIsVerified(true)
                             setEmailNotVerified(false)
-                            // After verification, try to login again
-                            await authLogin(formData.email, formData.password)
+                            // After verification, try to login again with rememberMe preference
+                            await authLogin(formData.email, formData.password, rememberMe)
                             navigate('/profile')
                           } catch (error) {
                             setVerificationError(error instanceof Error ? error.message : 'Invalid verification code')
@@ -277,7 +300,7 @@ export function Login() {
 
               {/* Form */}
               {!emailNotVerified && (
-                <form onSubmit={handleSubmit} className="flex flex-col gap-5 mt-2">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-5 mt-2" autoComplete="off">
                 {/* Email Field */}
                 <Input
                   label="Email"
@@ -289,6 +312,7 @@ export function Login() {
                   onBlur={() => handleBlur('email')}
                   error={errors.email}
                   required
+                  autoComplete="off"
                 />
 
                 {/* Password Field */}
@@ -305,6 +329,7 @@ export function Login() {
                       onChange={(e) => handleChange('password', e.target.value)}
                       onBlur={() => handleBlur('password')}
                       error={errors.password}
+                      autoComplete="new-password"
                     />
                     {formData.password.length > 0 && (
                       <button
@@ -325,20 +350,22 @@ export function Login() {
                   <div className="flex items-start gap-3">
                     <div className="flex h-6 items-center">
                       <input
-                        className="h-5 w-5 rounded border-neutral-300 text-primary focus:ring-primary/25 dark:border-neutral-600 dark:bg-neutral-700"
+                        className="h-5 w-5 rounded border-neutral-300 text-primary focus:ring-primary/25 dark:border-neutral-600 dark:bg-neutral-700 cursor-pointer"
                         id="remember"
                         type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
                       />
                     </div>
                     <label
                       htmlFor="remember"
-                      className="text-sm font-medium text-neutral-600 dark:text-neutral-400"
+                      className="text-sm font-medium text-neutral-600 dark:text-neutral-400 cursor-pointer"
                     >
                       Remember me
                     </label>
                   </div>
                   <Link
-                    to="/reset-password"
+                    to="/forgot-password"
                     className="text-sm font-bold text-primary hover:text-primary/80 hover:underline"
                   >
                     Forgot password?

@@ -503,6 +503,7 @@ export class AuthService {
         currentCompany: dto.currentCompany,
         sponsoringAgentId: dto.sponsoringAgentId,
         referralName: undefined,
+        crmAgent: true, // Set to true for CRM agent registrations
       },
       RoleEnum.AGENT,
     );
@@ -652,7 +653,7 @@ export class AuthService {
     }
   }
 
-  async resetPassword(email: string, password: string): Promise<void> {
+  async verifyPasswordResetCode(email: string, code: string): Promise<void> {
     const user = await this.usersService.findOne({ email });
 
     if (!user) {
@@ -665,7 +666,83 @@ export class AuthService {
       );
     }
 
+    if (!user.verificationCode || !user.verificationExpires) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          message: 'Verification code not found or expired',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    if (new Date() > new Date(user.verificationExpires)) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          message: 'Verification code has expired',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    if (user.verificationCode !== code) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          message: 'Invalid verification code',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+  }
+
+  async resetPassword(email: string, password: string, code: string): Promise<void> {
+    const user = await this.usersService.findOne({ email });
+
+    if (!user) {
+      throw new HttpException(
+        {
+          status: HttpStatus.UNPROCESSABLE_ENTITY,
+          message: 'User not found',
+        },
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
+    if (!user.verificationCode || !user.verificationExpires) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          message: 'Verification code not found or expired',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    if (new Date() > new Date(user.verificationExpires)) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          message: 'Verification code has expired',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    if (user.verificationCode !== code) {
+      throw new HttpException(
+        {
+          status: HttpStatus.FORBIDDEN,
+          message: 'Invalid verification code',
+        },
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     user.password = password;
+    user.verificationCode = null;
+    user.verificationExpires = null;
 
     await this.sessionService.softDelete({
       user: {

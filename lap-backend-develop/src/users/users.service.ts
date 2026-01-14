@@ -247,6 +247,32 @@ export class UsersService {
     return rawCart;
   }
 
+  async findCrmAgents({
+    sortOptions,
+    paginationOptions,
+  }: {
+    sortOptions?: SortUserDto[] | null;
+    paginationOptions: IPaginationOptions;
+  }): Promise<{ total: number; data: FindAllUserDto[] }> {
+    return this.usersRepository.findCrmAgents({
+      sortOptions,
+      paginationOptions,
+    });
+  }
+
+  async findPendingCrmAgents({
+    sortOptions,
+    paginationOptions,
+  }: {
+    sortOptions?: SortUserDto[] | null;
+    paginationOptions: IPaginationOptions;
+  }): Promise<{ total: number; data: FindAllUserDto[] }> {
+    return this.usersRepository.findPendingCrmAgents({
+      sortOptions,
+      paginationOptions,
+    });
+  }
+
   findOne(fields: EntityCondition<User>): Promise<NullableType<User>> {
     return this.usersRepository.findOne(fields);
   }

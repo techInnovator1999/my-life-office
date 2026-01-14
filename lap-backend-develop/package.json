@@ -16,6 +16,7 @@
     "seed:create:document": "hygen seeds create-document",
     "seed:run:relational": "ts-node -r tsconfig-paths/register ./src/database/seeds/relational/run-seed.ts",
     "seed:run:document": "ts-node -r tsconfig-paths/register ./src/database/seeds/document/run-seed.ts",
+    "create:admin": "ts-node -r tsconfig-paths/register ./src/scripts/create-admin.ts",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "prettier:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json}\"",

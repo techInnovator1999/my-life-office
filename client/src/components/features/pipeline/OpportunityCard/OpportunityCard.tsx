@@ -1,6 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { Opportunity, Temperature, PipelineCategory, CATEGORY_COLORS } from '@/types/opportunity'
+import { formatFullName } from '@/utils/formatters'
 
 type OpportunityCardProps = {
   opportunity: Opportunity
@@ -42,7 +43,7 @@ export function OpportunityCard({ opportunity, onClick, categoryId }: Opportunit
   }
 
   const contactName = opportunity.contact
-    ? `${opportunity.contact.firstName} ${opportunity.contact.lastName}`
+    ? formatFullName(opportunity.contact.firstName, opportunity.contact.lastName)
     : 'Unknown Contact'
 
   const temperature = opportunity.temperature || Temperature.UNKNOWN

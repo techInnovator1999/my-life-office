@@ -34,6 +34,7 @@ export function Select({
 }: SelectProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [hasBeenFocused, setHasBeenFocused] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -41,15 +42,18 @@ export function Select({
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false)
         setSearchTerm('')
-        if (onBlur) {
+        // Only call onBlur if the field was actually interacted with
+        if (onBlur && hasBeenFocused) {
           onBlur()
         }
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [onBlur])
+  }, [onBlur, isOpen, hasBeenFocused])
 
   const filteredOptions = searchable && searchTerm
     ? options.filter(opt =>
@@ -82,7 +86,15 @@ export function Select({
     .filter(Boolean)
     .join(' ')
 
-  const iconClasses = [
+  // Custom icon positioned on the LEFT to avoid conflict with dropdown arrow
+  const customIconClasses = [
+    'absolute left-3 top-1/2 -translate-y-1/2',
+    'text-neutral-400 group-focus-within:text-primary',
+    'transition-colors pointer-events-none',
+  ].join(' ')
+
+  // Dropdown arrow always on the RIGHT
+  const dropdownIconClasses = [
     'absolute right-3 top-1/2 -translate-y-1/2',
     'text-neutral-400 group-focus-within:text-primary',
     'transition-colors pointer-events-none',
@@ -99,22 +111,27 @@ export function Select({
       <div className="relative group" ref={dropdownRef}>
         <button
           type="button"
-          onClick={() => !disabled && setIsOpen(!isOpen)}
+          onClick={() => {
+            if (!disabled) {
+              setHasBeenFocused(true)
+              setIsOpen(!isOpen)
+            }
+          }}
           disabled={disabled}
           className={inputClasses}
         >
-          <div className="flex items-center justify-between pr-6">
+          <div className={`flex items-center justify-between ${icon ? 'pl-9' : ''} pr-6`}>
             <span className={selectedOption ? 'text-neutral-900 dark:text-white' : 'text-neutral-400 dark:text-text-muted-dark'}>
               {selectedOption ? selectedOption.label : placeholder}
             </span>
           </div>
         </button>
         {icon && (
-          <span className={iconClasses}>
+          <span className={customIconClasses}>
             <span className="material-symbols-outlined text-[18px]">{icon}</span>
           </span>
         )}
-        <span className={`${iconClasses} ${icon ? 'right-10' : ''}`}>
+        <span className={dropdownIconClasses}>
           <span className="material-symbols-outlined text-[18px]">
             {isOpen ? 'expand_less' : 'expand_more'}
           </span>

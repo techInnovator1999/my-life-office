@@ -25,6 +25,7 @@ import { FindAllUserDto } from './dto/find-all-user.dto';
 import { DeactivateUserDto } from './dto/deactivate-user.dto';
 import { CreateUserSuspensionDto } from './dto/create-user-suspension.dto';
 import { GetUserSuspensionDto } from './dto/get-user-suspension.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UsersGuard } from './users.guard';
 
 @ApiBearerAuth()
@@ -61,6 +62,59 @@ export class UsersController {
       },
     });
     return infinityPagination(data, total, { page, limit });
+  }
+
+  @Get('crm-agents')
+  @Roles([RoleEnum.ADMIN])
+  @ApiResponse({ type: FindAllUserDto })
+  @HttpCode(HttpStatus.OK)
+  async findCrmAgents(
+    @Query() query: QueryUserDto,
+  ): Promise<InfinityPaginationResultType<FindAllUserDto>> {
+    const page = query?.page ?? 1;
+    const limit = query?.limit ?? 10;
+    const { total, data } = await this.usersService.findCrmAgents({
+      sortOptions: query?.sort
+        ? query.sort
+        : [{ orderBy: 'createdAt', order: 'DESC' }],
+      paginationOptions: {
+        page,
+        limit,
+      },
+    });
+    return infinityPagination(data, total, { page, limit });
+  }
+
+  @Get('crm-agents/pending')
+  @Roles([RoleEnum.ADMIN])
+  @ApiResponse({ type: FindAllUserDto })
+  @HttpCode(HttpStatus.OK)
+  async findPendingCrmAgents(
+    @Query() query: QueryUserDto,
+  ): Promise<InfinityPaginationResultType<FindAllUserDto>> {
+    const page = query?.page ?? 1;
+    const limit = query?.limit ?? 10;
+    const { total, data } = await this.usersService.findPendingCrmAgents({
+      sortOptions: query?.sort
+        ? query.sort
+        : [{ orderBy: 'createdAt', order: 'DESC' }],
+      paginationOptions: {
+        page,
+        limit,
+      },
+    });
+    return infinityPagination(data, total, { page, limit });
+  }
+
+  @Post(':id/approve')
+  @Roles([RoleEnum.ADMIN])
+  @HttpCode(HttpStatus.OK)
+  async approveAgent(@Param('id') id: string): Promise<any> {
+    await this.usersService.update(id, {
+      isApproved: true,
+      approvedAt: new Date(),
+    });
+    return { message: 'Agent approved successfully' };
   }
 
   @Get('filter-chart')
@@ -148,5 +202,21 @@ export class UsersController {
   @ApiResponse({ type: GetUserSuspensionDto, isArray: true })
   async getMySuspensions(@Request() request): Promise<GetUserSuspensionDto[]> {
     return await this.usersService.getUserActiveSuspensions(request.user.id);
+  }
+
+  @Post(':id/update-profile')
+  @HttpCode(HttpStatus.OK)
+  @Roles([RoleEnum.ADMIN, RoleEnum.ACCOUNT_MANAGER, RoleEnum.AGENT])
+  async updateProfile(
+    @Param('id') id: string,
+    @Body() body: Partial<CreateUserDto>,
+    @Request() request,
+  ): Promise<any> {
+    // Users can only update their own profile unless they're admin
+    if (request.user.role.id !== RoleEnum.ADMIN && request.user.id !== id) {
+      throw new BadRequestException('You can only update your own profile');
+    }
+    const updatedUser = await this.usersService.update(id, body);
+    return updatedUser;
   }
 }

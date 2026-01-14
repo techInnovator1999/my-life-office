@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useAuth } from '@/store/authContext'
 import { toggleTheme, getInitialTheme } from '@/utils/theme'
+import { formatFullName } from '@/utils/formatters'
 import { useNavigate } from 'react-router-dom'
 
 type HeaderProps = {
@@ -124,7 +125,7 @@ export function Header({ onMenuClick }: HeaderProps) {
             {/* User Name - Hidden on mobile */}
             <div className="hidden md:block text-left">
               <p className="text-sm font-semibold text-text-main dark:text-white">
-                {user?.firstName} {user?.lastName}
+                {formatFullName(user?.firstName, user?.lastName)}
               </p>
             </div>
             <span className="material-symbols-outlined text-[20px] text-text-muted dark:text-text-muted-dark">
@@ -138,25 +139,37 @@ export function Header({ onMenuClick }: HeaderProps) {
               <div className="p-2">
                 <div className="px-3 py-2 border-b border-neutral-200 dark:border-slate-700 mb-2">
                   <p className="text-sm font-semibold text-text-main dark:text-white">
-                    {user?.firstName} {user?.lastName}
+                    {formatFullName(user?.firstName, user?.lastName)}
                   </p>
                   <p className="text-xs text-text-muted dark:text-text-muted-dark mt-0.5">{user?.email}</p>
                 </div>
                 <button
                   onClick={() => {
                     setIsUserMenuOpen(false)
-                    navigate('/settings')
+                    navigate('/profile')
                   }}
                   className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-neutral-50 dark:hover:bg-slate-700 transition-colors text-left"
                 >
                   <span className="material-symbols-outlined text-[20px] text-text-muted dark:text-text-muted-dark">
-                    settings
+                    person
                   </span>
-                  <span className="text-sm text-text-main dark:text-white">Settings</span>
+                  <span className="text-sm text-text-main dark:text-white">Profile</span>
+                </button>
+                <button
+                  onClick={() => {
+                    setIsUserMenuOpen(false)
+                    navigate('/forgot-password', { state: { email: user?.email, fromHeader: true } })
+                  }}
+                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-neutral-50 dark:hover:bg-slate-700 transition-colors text-left"
+                >
+                  <span className="material-symbols-outlined text-[20px] text-text-muted dark:text-text-muted-dark">
+                    lock_reset
+                  </span>
+                  <span className="text-sm text-text-main dark:text-white">Reset Password</span>
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-left"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-left mt-1"
                 >
                   <span className="material-symbols-outlined text-[20px] text-red-500">logout</span>
                   <span className="text-sm text-red-600 dark:text-red-400">Logout</span>

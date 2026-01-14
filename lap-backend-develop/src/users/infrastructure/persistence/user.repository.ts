@@ -30,6 +30,22 @@ export abstract class UserRepository {
     paginationOptions: IPaginationOptions;
   }): Promise<{ total: number; data: FindAllUserDto[] }>;
 
+  abstract findCrmAgents({
+    sortOptions,
+    paginationOptions,
+  }: {
+    sortOptions?: SortUserDto[] | null;
+    paginationOptions: IPaginationOptions;
+  }): Promise<{ total: number; data: FindAllUserDto[] }>;
+
+  abstract findPendingCrmAgents({
+    sortOptions,
+    paginationOptions,
+  }: {
+    sortOptions?: SortUserDto[] | null;
+    paginationOptions: IPaginationOptions;
+  }): Promise<{ total: number; data: FindAllUserDto[] }>;
+
   abstract findMany(fields: EntityCondition<User>): Promise<FindAllUserDto[]>;
 
   abstract findAllWithConditions(

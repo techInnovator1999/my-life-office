@@ -59,7 +59,7 @@
                         id='m_-3954363444291846520template_header'
                         style="
                           font-size: 14px;
-                          background-color: #073763;
+                          background-color: {{#if headerColor}}{{headerColor}}{{else}}#073763{{/if}};
                           color: #fff;
                           border-bottom: 0;
                           font-weight: bold;
@@ -93,7 +93,7 @@
                                   color: #fff;
                                 "
                               >
-                                {{text2}}
+                                {{#if headerTitle}}{{headerTitle}}{{else}}{{text2}}{{/if}}
                               </h1>
                             </td>
                           </tr>
@@ -233,6 +233,13 @@
                                           {{text7}}
                                           <br />{{text8}}
                                         </p>
+                                        {{#if showAdminNote}}
+                                        <p
+                                          style='margin: 20px 0 0; color: #636363; font-weight: bold;'
+                                        >
+                                          Note: After email verification, your account will be pending admin approval. You can log in and complete your profile while waiting for approval.
+                                        </p>
+                                        {{/if}}
                                       </div>
                                     </td>
                                   </tr>

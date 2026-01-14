@@ -35,7 +35,7 @@ export class UserMapper {
     }
 
     if (raw.role) {
-      user.role = { id: raw.role.id };
+      user.role = { id: raw.role.id, name: raw.role.name };
     }
     user.status = raw?.status;
     user.lastLogin = raw?.lastLogin;
@@ -64,6 +64,7 @@ export class UserMapper {
     user.googleTokenExpiry = raw.googleTokenExpiry;
     user.lastGoogleSyncAt = raw.lastGoogleSyncAt;
     user.sponsoringAgentId = raw.sponsoringAgentId;
+    user.crmAgent = raw.crmAgent ?? false;
     return user;
   }
 
@@ -174,6 +175,7 @@ export class UserMapper {
     userEntity.googleTokenExpiry = user.googleTokenExpiry;
     userEntity.lastGoogleSyncAt = user.lastGoogleSyncAt;
     userEntity.sponsoringAgentId = user.sponsoringAgentId;
+    userEntity.crmAgent = user.crmAgent ?? false;
     return userEntity;
   }
 }

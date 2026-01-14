@@ -201,6 +201,99 @@ export class UsersRelationalRepository implements UserRepository {
     return { total, data };
   }
 
+  async findCrmAgents({
+    sortOptions,
+    paginationOptions,
+  }: {
+    sortOptions?: SortUserDto[] | null;
+    paginationOptions: IPaginationOptions;
+  }): Promise<{ total: number; data: FindAllUserDto[] }> {
+    const where: FindOptionsWhere<UserEntity> = {
+      crmAgent: true,
+    };
+
+    // Count total records
+    const total = await this.usersRepository.count({ where });
+
+    // Build query options
+    const findManyOptions: FindManyOptions<UserEntity> = {
+      where,
+      relations: {
+        role: true,
+        status: true,
+        photo: true,
+      },
+    };
+
+    // Apply sorting
+    if (sortOptions && sortOptions.length > 0) {
+      findManyOptions.order = {};
+      for (const sort of sortOptions) {
+        findManyOptions.order[sort.orderBy] = sort.order.toUpperCase() as 'ASC' | 'DESC';
+      }
+    } else {
+      findManyOptions.order = { createdAt: 'DESC' };
+    }
+
+    // Apply pagination
+    const { page, limit } = paginationOptions;
+    const skip = (page - 1) * limit;
+    findManyOptions.skip = skip;
+    findManyOptions.take = limit;
+
+    // Execute query
+    const entities = await this.usersRepository.find(findManyOptions);
+    const data = entities.map((user) => UserMapper.toDomainMany(user));
+    return { total, data };
+  }
+
+  async findPendingCrmAgents({
+    sortOptions,
+    paginationOptions,
+  }: {
+    sortOptions?: SortUserDto[] | null;
+    paginationOptions: IPaginationOptions;
+  }): Promise<{ total: number; data: FindAllUserDto[] }> {
+    const where: FindOptionsWhere<UserEntity> = {
+      crmAgent: true,
+      isApproved: false,
+    };
+
+    // Count total records
+    const total = await this.usersRepository.count({ where });
+
+    // Build query options
+    const findManyOptions: FindManyOptions<UserEntity> = {
+      where,
+      relations: {
+        role: true,
+        status: true,
+        photo: true,
+      },
+    };
+
+    // Apply sorting
+    if (sortOptions && sortOptions.length > 0) {
+      findManyOptions.order = {};
+      for (const sort of sortOptions) {
+        findManyOptions.order[sort.orderBy] = sort.order.toUpperCase() as 'ASC' | 'DESC';
+      }
+    } else {
+      findManyOptions.order = { createdAt: 'DESC' };
+    }
+
+    // Apply pagination
+    const { page, limit } = paginationOptions;
+    const skip = (page - 1) * limit;
+    findManyOptions.skip = skip;
+    findManyOptions.take = limit;
+
+    // Execute query
+    const entities = await this.usersRepository.find(findManyOptions);
+    const data = entities.map((user) => UserMapper.toDomainMany(user));
+    return { total, data };
+  }
+
   async findOne(fields: EntityCondition<User>): Promise<NullableType<User>> {
     const entity = await this.usersRepository.findOne({
       where: fields as FindOptionsWhere<UserEntity>,

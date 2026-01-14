@@ -26,10 +26,7 @@ export function PrivateRoute({ children }: PrivateRouteProps) {
     return <Navigate to="/profile" replace />
   }
 
-  // If user is approved and on profile page, redirect to dashboard
-  if (user && user.isApproved && location.pathname === '/profile') {
-    return <Navigate to="/dashboard" replace />
-  }
+  // Allow approved users to access profile page (no redirect)
 
   return <>{children}</>
 }

@@ -144,6 +144,19 @@ export class AuthController {
     );
   }
 
+  @Post('crm/forgot/password')
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({ status: HttpStatus.OK })
+  async crmForgotPassword(
+    @Body() forgotPasswordDto: AuthForgotPasswordDto,
+  ): Promise<void> {
+    return this.service.forgotPassword(
+      forgotPasswordDto.email,
+      RoleEnum.AGENT,
+      forgotPasswordDto.isResend,
+    );
+  }
+
   @Post('invite')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RolesGuard, UsersGuard)
@@ -162,6 +175,18 @@ export class AuthController {
     return await this.service.inviteAccountManager(createAccountManagerDto);
   }
 
+  @Post('verify/password-reset-code')
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({ status: HttpStatus.OK })
+  verifyPasswordResetCode(
+    @Body() verifyCodeDto: { email: string; code: string },
+  ): Promise<void> {
+    return this.service.verifyPasswordResetCode(
+      verifyCodeDto.email,
+      verifyCodeDto.code,
+    );
+  }
+
   @Post('reset/password')
   @HttpCode(HttpStatus.CREATED)
   @ApiResponse({ status: HttpStatus.CREATED })
@@ -169,6 +194,7 @@ export class AuthController {
     return this.service.resetPassword(
       resetPasswordDto.email,
       resetPasswordDto.password,
+      resetPasswordDto.code,
     );
   }
 

@@ -173,7 +173,7 @@ export class MailService {
         'src',
         'mail',
         'mail-templates',
-        'crm-agent-signup.hbs',
+        'account-register.hbs',
       ),
     };
     this.defaultTags = {
@@ -623,7 +623,12 @@ export class MailService {
       translationKeys,
       EmailNameEnum.CRM_AGENT_SIGNUP,
       i18n,
-      this.defaultTags,
+      {
+        ...this.defaultTags,
+        headerColor: '#307fef', // Primary color for CRM agent portal
+        headerTitle: 'Welcome to CRM Agent Portal', // Hardcoded title for CRM
+        showAdminNote: true, // Show admin approval note for CRM agents
+      },
     );
   }
 }
